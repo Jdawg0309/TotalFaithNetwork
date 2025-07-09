@@ -78,7 +78,7 @@ For inquiries or bookings, contact: legacbuilders933@gmail.com`,
     description: 'Founder of TFNTV and a global advocate for media literacy and community empowerment.',
     bio: `Dr. Cynthia O. Ashley is a pioneering media literacy educator, ordained minister, and award-winning television host with over 25 years of service in media, ministry, and public leadership. She holds a Doctorate in Media Literacy Pedagogy and Research, along with degrees in divinity, communication, and law.
 
-As founder and former President of TFNTV, a certified Women Minority Business Enterprise, she created platforms such as the Total Faith Awards, the African Diaspora Tribute Image Awards, and *SASSY Women Who Win*.
+As founder and President of Total Faith Network, a Minority Business Enterprise and a woman's minority enterprise, she is the executive producers of Total Faith Awards Gala Benefit, the African Diaspora Tribute Image Awards, and *SASSY Women Who Win*, Choosen Handmaiden Retreat, Prayer Meditation and Surrender Prophetic World Summit, Intl' Leadership empowerment and Prophetic Summit.
 
 In 2018, she made history as the first Black woman to register with the NY State Board of Elections to run for Mayor of Yonkers, later transitioning her candidacy to County Legislator. She is also a survivor of traumatic brain injury and advocates for healing and transformation.
 
@@ -86,7 +86,7 @@ Internationally, Dr. Ashley serves as Executive Board Chair of ROCMAN Foundation
 
 She has received numerous honors, including from Senator Andrea Stewart-Cousins, Congressman Eliot Engel, and Mayor Mike Spano. Her events draw dignitaries such as Queen Mother Dr. Dòris Blakely and HRM Dr. Olori Temitope Enitan Ogunwusi.
 
-Through her ministries—The Cyndi Ashley Network International (CAN-I), PMS: Paradigm Mind Shift, and Upon This Rock International—Dr. Ashley continues to inspire transformation with a powerful blend of faith, media, and advocacy.`,
+Through her ministries—Cyndi Ashley Network International (CAN-I), PMS: Paradigm Mind Shift. Ashley continues to inspire transformation with a powerful blend of faith, media, and advocacy.`,
     image: cynthiaImg,
   },
 ];
@@ -197,7 +197,7 @@ Through her ministries—The Cyndi Ashley Network International (CAN-I), PMS: Pa
               </TributeOverlay>
             </TributeImageContainer>
             <TributeContent>
-              <TributeName>Queen Mother Vivian Ashley Smith</TributeName>
+              <TributeName>Queen Mother Vivian Ashley Smith-Militano</TributeName>
               <TributeDates>1944 – 2017</TributeDates>
             </TributeContent>
           </TributeCard>

@@ -77,7 +77,7 @@ const Navbar = () => {
             onClick={handleToggle}
           >
             <FiBriefcase className="button-icon" />
-            <ButtonText>Portfolio</ButtonText>
+            <ButtonText>ViewTube</ButtonText>
           </RemoteButton>
           
           <RemoteButton 

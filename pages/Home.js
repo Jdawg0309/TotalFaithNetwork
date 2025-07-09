@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createGlobalStyle } from 'styled-components';
-import introVideo from '../backend/uploads/videos/video7.mp4';
+import introVideo from '../backend/uploads/videos/intro.mp4';
 import { useSpring, animated, config as springConfig } from 'react-spring';
 import styled, { keyframes } from 'styled-components';
-import Footer from '../components/Footer';
 import FeaturedShows from '../components/FeaturedShows';
 import ChannelGuide from '../components/ChannelGuide';
 import TheaterStage from '../components/TheaterStage';

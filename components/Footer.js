@@ -6,12 +6,12 @@ const Footer = () => {
   const socialLinks = [
     {
       platform: 'YouTube',
-      url: 'https://www.youtube.com/@TotalFaithClips',
+      url: 'https://www.youtube.com/@TFNBroadcast',
       icon: <FaYoutube />,
     },
     {
       platform: 'Instagram',
-      url: 'https://www.instagram.com/tfntv_media/',
+      url: 'https://www.instagram.com/totalfaithnetwork/',
       icon: <FaInstagram />,
     },
     {
@@ -20,7 +20,7 @@ const Footer = () => {
       icon: <FaVimeoV />,
     },
     {
-      platform: 'Twitter',
+      platform: 'X (Twitter)',
       url: 'https://x.com/TFNBroadcast',
       icon: <FaTwitter />,
     },

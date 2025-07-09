@@ -8,6 +8,9 @@ import Contact from './pages/Contact';
 import Footer from './components/Footer';
 import GlobalStyles from './GlobalStyles';
 import Services from './pages/Services';
+import Uploads from './pages/Uploads';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 
 // Main App component with router
 function App() {
@@ -33,6 +36,9 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/services" element={<Services />} />
+        <Route path="/uploads" element={<Uploads />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
       
       <Footer />

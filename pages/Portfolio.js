@@ -1,81 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { createGlobalStyle, keyframes } from 'styled-components';
 import { useSpring, animated } from '@react-spring/web';
-
-// Import video files
-import video1File from '../backend/uploads/videos/video1.mp4';
-import video2File from '../backend/uploads/videos/video2.mp4';
-import video3File from '../backend/uploads/videos/video3.mp4';
-import video4File from '../backend/uploads/videos/video4.mp4';
-import video5File from '../backend/uploads/videos/video5.mp4';
-import video6File from '../backend/uploads/videos/video6.mp4';
-// Import avatar images
-import evelynImg from '../backend/uploads/images/evelyn.jpeg';
-import winfieldImg from '../backend/uploads/images/winfield.jpeg';
-import cynthiaImg from '../backend/uploads/images/cynthia.jpeg';
-
-const dummyProjects = [
-  {
-    id: 1,
-    title: 'Faith in the Fire',
-    description: 'A powerful message on perseverance through trials, part of TFNTV\'s inspirational media series.',
-    avatar: evelynImg,
-    channel: 'Total Faith Network',
-    views: '1.2M views',
-    timestamp: '2 days ago',
-    videoUrl: video1File,
-  },
-  {
-    id: 2,
-    title: 'Worship and Wonder',
-    description: 'A live worship session that captures the heart of community and faith through music and praise.',
-    avatar: winfieldImg,
-    channel: 'TFN Worship',
-    views: '850K views',
-    timestamp: '1 week ago',
-    videoUrl: video2File,
-  },
-  {
-    id: 3,
-    title: 'Purpose Driven Life',
-    description: 'Explore God\'s purpose for your life in this thought-provoking episode on identity and calling.',
-    avatar: cynthiaImg,
-    channel: 'TFNTV Originals',
-    views: '500K views',
-    timestamp: '3 weeks ago',
-    videoUrl: video3File,
-  },
-  {
-    id: 4,
-    title: 'Healed and Whole',
-    description: 'Stories of healing, prayers, and spiritual encouragement for those battling autoimmune illness.',
-    avatar: evelynImg,
-    channel: 'Healing at TFN',
-    views: '2M views',
-    timestamp: '1 month ago',
-    videoUrl: video4File,
-  },
-  {
-    id: 5,
-    title: 'Walking in Wisdom',
-    description: 'A Bible-based series unpacking timeless wisdom from Proverbs for everyday decision-making.',
-    avatar: winfieldImg,
-    channel: 'TFN Bible Study',
-    views: '3.5M views',
-    timestamp: '2 months ago',
-    videoUrl: video5File,
-  },
-  {
-    id: 6,
-    title: 'Total Faith Youth Session',
-    description: 'Young believers share how faith empowers them in school, sports, and life\'s challenges.',
-    avatar: cynthiaImg,
-    channel: 'TFN Youth Voices',
-    views: '950K views',
-    timestamp: '2 months ago',
-    videoUrl: video6File,
-  },
-];
 
 const starTwinkle = keyframes`
   0%, 100% { opacity: 0.4; }
@@ -83,7 +8,8 @@ const starTwinkle = keyframes`
 `;
 
 const Portfolio = () => {
-  const [selectedVideo, setSelectedVideo] = useState(dummyProjects[0]);
+  const [projects, setProjects] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
   const [thumbnails, setThumbnails] = useState({});
   const fadeIn = useSpring({ 
     from: { opacity: 0, transform: 'translateY(20px)' }, 
@@ -91,58 +17,70 @@ const Portfolio = () => {
     config: { tension: 200, friction: 20, duration: 800 } 
   });
 
-  // Generate thumbnails for videos
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/videos');
+        const data = await res.json();
+        setProjects(data);
+        setSelectedVideo(data[0]);
+      } catch (err) {
+        console.error('Error fetching videos:', err);
+      }
+    };
+    fetchVideos();
+  }, []);
+
   useEffect(() => {
     const generateThumbnails = async () => {
       const newThumbnails = {};
-      
-      for (const project of dummyProjects) {
+
+      for (const project of projects) {
         try {
-          const thumbnail = await getVideoThumbnail(project.videoUrl);
+          const thumbnail = await getVideoThumbnail(`http://localhost:5000${project.video_url}`);
           newThumbnails[project.id] = thumbnail;
         } catch (error) {
           console.error('Error generating thumbnail:', error);
-          newThumbnails[project.id] = project.avatar; // Fallback to avatar if thumbnail generation fails
+          newThumbnails[project.id] = `http://localhost:5000${project.avatar_url}`;
         }
       }
-      
       setThumbnails(newThumbnails);
     };
+    if (projects.length > 0) generateThumbnails();
+  }, [projects]);
 
-    generateThumbnails();
-  }, []);
-
-  // Function to capture video thumbnail
   const getVideoThumbnail = (videoUrl) => {
     return new Promise((resolve, reject) => {
       const video = document.createElement('video');
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      
+
       video.src = videoUrl;
       video.crossOrigin = 'anonymous';
-      
       video.addEventListener('loadedmetadata', () => {
-        // Set canvas dimensions to match video
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        
-        // Seek to a specific time (e.g., 2 seconds) to capture frame
         video.currentTime = 2;
       });
-      
+
       video.addEventListener('seeked', () => {
-        // Draw video frame to canvas
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Convert canvas to data URL
         const thumbnailUrl = canvas.toDataURL('image/jpeg');
         resolve(thumbnailUrl);
       });
-      
+
       video.addEventListener('error', reject);
     });
   };
+
+  if (!selectedVideo) return <p style={{ color: 'white', padding: '2rem' }}>Loading...</p>;
+
+  const grouped = projects.reduce((acc, video) => {
+    const cat = video.category || 'Uncategorized';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(video);
+    return acc;
+  }, {});
 
   return (
     <>
@@ -162,49 +100,51 @@ const Portfolio = () => {
       <PageContainer>
         <VideoTitle>{selectedVideo.title}</VideoTitle>
         <VideoPlayer controls key={selectedVideo.id}>
-          <source src={selectedVideo.videoUrl} type="video/mp4" />
+          <source src={`http://localhost:5000${selectedVideo.video_url}`} type="video/mp4" />
           Your browser does not support video playback.
         </VideoPlayer>
         <VideoInfo>
-          <ChannelAvatar src={selectedVideo.avatar} alt={selectedVideo.channel} />
+          <ChannelAvatar src={`http://localhost:5000${selectedVideo.avatar_url}`} alt={selectedVideo.channel} />
           <VideoText>
             <VideoTitleBig>{selectedVideo.title}</VideoTitleBig>
             <StatsRow>
-              <Views>{selectedVideo.views}</Views>
+              <Views>{selectedVideo.views || '0 views'}</Views>
               <Dot>•</Dot>
-              <Timestamp>{selectedVideo.timestamp}</Timestamp>
+              <Timestamp>{selectedVideo.timestamp || 'Recently uploaded'}</Timestamp>
             </StatsRow>
             <Description>{selectedVideo.description}</Description>
           </VideoText>
         </VideoInfo>
-        <GridSection style={fadeIn}>
-          <GridTitle>Recommended</GridTitle>
-          <Grid>
-            {dummyProjects.map((project) => (
-              <Card key={project.id} onClick={() => setSelectedVideo(project)}>
-                <ThumbnailWrapper>
-                  {thumbnails[project.id] ? (
-                    <Thumbnail src={thumbnails[project.id]} alt={project.title} />
-                  ) : (
-                    <ThumbnailPlaceholder>
-                      <LoadingSpinner />
-                    </ThumbnailPlaceholder>
-                  )}
-                  <PlayIcon>▶</PlayIcon>
-                  <DurationBadge>5:42</DurationBadge>
-                </ThumbnailWrapper>
-                <InfoRow>
-                  <SmallAvatar src={project.avatar} alt={project.channel} />
-                  <InfoText>
-                    <CardTitle>{project.title}</CardTitle>
-                    <ChannelNameSmall>{project.channel}</ChannelNameSmall>
-                    <StatsSmall>{project.views} • {project.timestamp}</StatsSmall>
-                  </InfoText>
-                </InfoRow>
-              </Card>
-            ))}
-          </Grid>
-        </GridSection>
+
+        {Object.entries(grouped).map(([category, items]) => (
+          <GridSection key={category} style={fadeIn}>
+            <GridTitle>{category}</GridTitle>
+            <Grid>
+              {items.map((project) => (
+                <Card key={project.id} onClick={() => setSelectedVideo(project)}>
+                  <ThumbnailWrapper>
+                    {thumbnails[project.id] ? (
+                      <Thumbnail src={thumbnails[project.id]} alt={project.title} />
+                    ) : (
+                      <ThumbnailPlaceholder><LoadingSpinner /></ThumbnailPlaceholder>
+                    )}
+                    <PlayIcon>▶</PlayIcon>
+                    <DurationBadge>5:42</DurationBadge>
+                  </ThumbnailWrapper>
+                  <InfoRow>
+                    <SmallAvatar src={`http://localhost:5000${project.avatar_url}`} alt={project.channel} />
+                    <InfoText>
+                      <CardTitle>{project.title}</CardTitle>
+                      <ChannelNameSmall>{project.channel}</ChannelNameSmall>
+                      <StatsSmall>{project.views || '0 views'} • {project.timestamp || 'New'}</StatsSmall>
+                    </InfoText>
+                  </InfoRow>
+                </Card>
+              ))}
+            </Grid>
+          </GridSection>
+        ))}
+
       </PageContainer>
     </>
   );
