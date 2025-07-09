@@ -12,6 +12,7 @@ const avatarDir = path.resolve(__dirname, '../uploads/avatars');
 
 fs.mkdirSync(videoDir, { recursive: true });
 fs.mkdirSync(avatarDir, { recursive: true });
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const folder = file.fieldname === 'video' ? videoDir : avatarDir;
@@ -21,7 +22,6 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));
   }
 });
-
 
 const upload = multer({ storage });
 
@@ -60,6 +60,19 @@ router.delete('/:id', auth, (req, res) => {
 
   db.prepare('DELETE FROM videos WHERE id = ?').run(id);
   res.json({ message: 'Deleted' });
+});
+
+// Update video title/description/category
+router.put('/:id', auth, (req, res) => {
+  const { id } = req.params;
+  const { title, description, category_id } = req.body;
+  const video = db.prepare('SELECT * FROM videos WHERE id = ?').get(id);
+  if (!video) return res.status(404).json({ message: 'Video not found' });
+
+  db.prepare('UPDATE videos SET title = ?, description = ?, category_id = ? WHERE id = ?')
+    .run(title || video.title, description || video.description, category_id || video.category_id, id);
+
+  res.json({ message: 'Video updated' });
 });
 
 module.exports = router;
