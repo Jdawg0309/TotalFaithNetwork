@@ -3,9 +3,11 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const videoRoutes = require('./routes/videos');
 const categoryRoutes = require('./routes/categories');
-const path = require('path');
 const adminRoutes = require('./routes/admin');
-require('dotenv').config();
+const path = require('path');
+
+// ✅ Explicit dotenv path resolution
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 app.use(cors());

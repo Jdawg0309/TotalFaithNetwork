@@ -17,6 +17,9 @@ import Advisory3 from '../backend/uploads/images/Advisory3.jpg';
 import Advisory4 from '../backend/uploads/images/Advisory4.jpg';
 import Advisory5 from '../backend/uploads/images/Advisory5.jpg';
 import Advisory6 from '../backend/uploads/images/Advisory6.jpg';
+import Advisory7 from '../backend/uploads/images/Advisory7.jpg';
+import Advisory8 from '../backend/uploads/images/Advisory8.jpg';
+import Advisory9 from '../backend/uploads/images/Advisory9.jpg';
 import tribute1 from '../backend/uploads/images/IMG_3361.jpeg';
 import tribute2 from '../backend/uploads/images/IMG_3362.jpeg';
 import tribute3 from '../backend/uploads/images/IMG_3363.jpeg';
@@ -33,7 +36,7 @@ const pulse = keyframes`
   100% { transform: scale(1); }
 `;
 
-const advisoryImages = [Advisory1, Advisory2, Advisory3, Advisory4, Advisory5, Advisory6];
+const advisoryImages = [Advisory1, Advisory2, Advisory3, Advisory4, Advisory5, Advisory6, Advisory7, Advisory8, Advisory9];
 
 const About = () => {
   const pageFade = useSpring({ 

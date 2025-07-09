@@ -1,4 +1,3 @@
-// src/pages/Login.js
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
@@ -21,8 +20,8 @@ const Login = () => {
 
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem('token', data.token);
-        navigate('/admin');
+        localStorage.setItem('authToken', data.token);  // ✅ Store token as 'authToken'
+        navigate('/admin/dashboard');  // Redirect after login
       } else {
         setError(data.message || 'Login failed');
       }

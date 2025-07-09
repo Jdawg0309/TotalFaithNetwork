@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled, { createGlobalStyle, keyframes } from 'styled-components';
 import { useSpring, animated } from '@react-spring/web';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+
 const starTwinkle = keyframes`
   0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }
@@ -20,10 +22,12 @@ const Portfolio = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/videos');
+        const res = await fetch(`${API_BASE_URL}/api/videos?page=1&limit=100`);
         const data = await res.json();
-        setProjects(data);
-        setSelectedVideo(data[0]);
+        setProjects(data.videos);
+        if (data.videos.length > 0) {
+          setSelectedVideo(data.videos[0]);
+        }
       } catch (err) {
         console.error('Error fetching videos:', err);
       }
@@ -34,14 +38,12 @@ const Portfolio = () => {
   useEffect(() => {
     const generateThumbnails = async () => {
       const newThumbnails = {};
-
       for (const project of projects) {
         try {
-          const thumbnail = await getVideoThumbnail(`http://localhost:5000${project.video_url}`);
+          const thumbnail = await getVideoThumbnail(`${API_BASE_URL}${project.video_url}`);
           newThumbnails[project.id] = thumbnail;
         } catch (error) {
-          console.error('Error generating thumbnail:', error);
-          newThumbnails[project.id] = `http://localhost:5000${project.avatar_url}`;
+          newThumbnails[project.id] = `${API_BASE_URL}${project.avatar_url}`;
         }
       }
       setThumbnails(newThumbnails);
@@ -54,7 +56,6 @@ const Portfolio = () => {
       const video = document.createElement('video');
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-
       video.src = videoUrl;
       video.crossOrigin = 'anonymous';
       video.addEventListener('loadedmetadata', () => {
@@ -62,13 +63,10 @@ const Portfolio = () => {
         canvas.height = video.videoHeight;
         video.currentTime = 2;
       });
-
       video.addEventListener('seeked', () => {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const thumbnailUrl = canvas.toDataURL('image/jpeg');
-        resolve(thumbnailUrl);
+        resolve(canvas.toDataURL('image/jpeg'));
       });
-
       video.addEventListener('error', reject);
     });
   };
@@ -76,7 +74,7 @@ const Portfolio = () => {
   if (!selectedVideo) return <p style={{ color: 'white', padding: '2rem' }}>Loading...</p>;
 
   const grouped = projects.reduce((acc, video) => {
-    const cat = video.category || 'Uncategorized';
+    const cat = video.category_name || 'Uncategorized';
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(video);
     return acc;
@@ -87,30 +85,23 @@ const Portfolio = () => {
       <GlobalStyle />
       <StarryBackground>
         {Array.from({ length: 150 }).map((_, i) => (
-          <Star 
-            key={i} 
-            size={Math.random() * 3 + 1} 
-            left={`${Math.random() * 100}%`} 
-            top={`${Math.random() * 100}%`} 
-            delay={Math.random() * 5} 
-            duration={Math.random() * 3 + 2} 
-          />
+          <Star key={i} size={Math.random() * 3 + 1} left={`${Math.random() * 100}%`} top={`${Math.random() * 100}%`} delay={Math.random() * 5} duration={Math.random() * 3 + 2} />
         ))}
       </StarryBackground>
       <PageContainer>
         <VideoTitle>{selectedVideo.title}</VideoTitle>
         <VideoPlayer controls key={selectedVideo.id}>
-          <source src={`http://localhost:5000${selectedVideo.video_url}`} type="video/mp4" />
+          <source src={`${API_BASE_URL}${selectedVideo.video_url}`} type="video/mp4" />
           Your browser does not support video playback.
         </VideoPlayer>
         <VideoInfo>
-          <ChannelAvatar src={`http://localhost:5000${selectedVideo.avatar_url}`} alt={selectedVideo.channel} />
+          <ChannelAvatar src={`${API_BASE_URL}${selectedVideo.avatar_url}`} alt={selectedVideo.channel} />
           <VideoText>
             <VideoTitleBig>{selectedVideo.title}</VideoTitleBig>
             <StatsRow>
               <Views>{selectedVideo.views || '0 views'}</Views>
               <Dot>•</Dot>
-              <Timestamp>{selectedVideo.timestamp || 'Recently uploaded'}</Timestamp>
+              <Timestamp>{selectedVideo.created_at || 'Recently uploaded'}</Timestamp>
             </StatsRow>
             <Description>{selectedVideo.description}</Description>
           </VideoText>
@@ -129,14 +120,14 @@ const Portfolio = () => {
                       <ThumbnailPlaceholder><LoadingSpinner /></ThumbnailPlaceholder>
                     )}
                     <PlayIcon>▶</PlayIcon>
-                    <DurationBadge>5:42</DurationBadge>
+                    <DurationBadge>{project.duration || '0:00'}</DurationBadge>
                   </ThumbnailWrapper>
                   <InfoRow>
-                    <SmallAvatar src={`http://localhost:5000${project.avatar_url}`} alt={project.channel} />
+                    <SmallAvatar src={`${API_BASE_URL}${project.avatar_url}`} alt={project.channel} />
                     <InfoText>
                       <CardTitle>{project.title}</CardTitle>
                       <ChannelNameSmall>{project.channel}</ChannelNameSmall>
-                      <StatsSmall>{project.views || '0 views'} • {project.timestamp || 'New'}</StatsSmall>
+                      <StatsSmall>{project.views || '0 views'} • {project.created_at || 'New'}</StatsSmall>
                     </InfoText>
                   </InfoRow>
                 </Card>
@@ -144,13 +135,17 @@ const Portfolio = () => {
             </Grid>
           </GridSection>
         ))}
-
       </PageContainer>
     </>
   );
 };
 
 export default Portfolio;
+
+// 💫 All styled-components (StarryBackground, Star, PageContainer, etc.) remain the same as in your existing file.
+
+// ... (Styled components remain unchanged from your version above)
+
 
 const GlobalStyle = createGlobalStyle`
   *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

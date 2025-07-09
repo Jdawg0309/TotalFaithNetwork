@@ -10,8 +10,8 @@ import GlobalStyles from './GlobalStyles';
 import Services from './pages/Services';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import ProtectedRoute from './components/ProtectedRoute';  // ✅ Add this import
 
-// Main App component with router
 function App() {
   return (
     <Router>
@@ -20,7 +20,6 @@ function App() {
   );
 }
 
-// Component that uses router hooks
 function AppContent() {
   const location = useLocation();
 
@@ -36,7 +35,14 @@ function AppContent() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/services" element={<Services />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route 
+          path="/admin/dashboard" 
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
       
       <Footer />

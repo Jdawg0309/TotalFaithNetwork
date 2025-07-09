@@ -1,68 +1,154 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect, useCallback } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
+import AdminHeader from '../components/AdminHeader';
+import AdminSidebar from '../components/AdminSidebar';
+import VideoForm from '../components/VideoForm';
+import VideoList from '../components/VideoList';
+import CategoryManager from '../components/CategoryManager';
+import { DashboardContainer, DashboardContent, MainContent, SectionDivider } from '../components/StyledComponents';
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (!token) navigate('/admin/login');
+  }, [navigate]);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     channel: '',
-    category_id: ''
+    category_id: '',
+    duration: ''
   });
   const [videoFile, setVideoFile] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
-  const [message, setMessage] = useState('');
   const [videos, setVideos] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [newCategory, setNewCategory] = useState('');
+  const videosPerPage = 10;
 
-  const fetchVideos = async () => {
-    const res = await fetch('http://localhost:5000/api/videos');
-    const data = await res.json();
-    setVideos(data);
-  };
+  const fetchVideos = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/videos?page=${currentPage}&limit=${videosPerPage}&search=${searchTerm}`);
+      if (!res.ok) throw new Error('Failed to fetch videos');
+      const { videos, totalPages } = await res.json();
+      setVideos(videos);
+      setTotalPages(totalPages);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, searchTerm]);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/categories`);
+      if (!res.ok) throw new Error('Failed to fetch categories');
+      const data = await res.json();
+      setCategories(data);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }, []);
 
   useEffect(() => {
     fetchVideos();
-  }, []);
+    fetchCategories();
+  }, [fetchVideos, fetchCategories]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    if (!videoFile) return;
+    const objectUrl = URL.createObjectURL(videoFile);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [videoFile]);
+
+  const getAuthToken = () => localStorage.getItem('authToken') || '';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!videoFile) return alert('Please select a video.');
-
-    const data = new FormData();
-    data.append('title', formData.title);
-    data.append('description', formData.description);
-    data.append('channel', formData.channel);
-    data.append('category_id', formData.category_id);
-    data.append('video', videoFile);
-    if (avatarFile) data.append('avatar', avatarFile);
-
+    setIsSubmitting(true);
     try {
-      const res = await fetch('http://localhost:5000/api/videos/upload', {
+      const data = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value) data.append(key, value);
+      });
+      if (videoFile) data.append('video', videoFile);
+      if (avatarFile) data.append('avatar', avatarFile);
+
+      const res = await fetch(`${API_BASE_URL}/api/videos/upload`, {
         method: 'POST',
-        headers: {
-          Authorization: 'Bearer dummy-token-for-now'
-        },
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
         body: data
       });
-      const text = await res.text();
-      setMessage(text);
+
+      if (!res.ok) throw new Error('Upload failed');
+      toast.success('Video uploaded!');
+      resetForm();
       fetchVideos();
     } catch (err) {
-      console.error(err);
-      setMessage('Upload failed.');
+      toast.error(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!editingId) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/videos/${editingId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify(formData)
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Update failed');
+      }
+      toast.success('Video updated!');
+      resetForm();
+      fetchVideos();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id) => {
-    await fetch(`http://localhost:5000/api/videos/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: 'Bearer dummy-token-for-now' }
-    });
-    fetchVideos();
+    if (!window.confirm('Are you sure you want to delete this video?')) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/videos/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${getAuthToken()}` }
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Delete failed');
+      }
+      toast.info('Video deleted');
+      fetchVideos();
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   const handleEdit = (video) => {
@@ -71,148 +157,114 @@ const AdminDashboard = () => {
       title: video.title,
       description: video.description,
       channel: video.channel,
-      category_id: video.category_id
+      category_id: video.category_id,
+      duration: video.duration
     });
   };
 
-  const handleUpdate = async () => {
-    await fetch(`http://localhost:5000/api/videos/${editingId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer dummy-token-for-now'
-      },
-      body: JSON.stringify(formData)
-    });
+  const resetForm = () => {
+    setFormData({ title: '', description: '', channel: '', category_id: '', duration: '' });
+    setVideoFile(null);
+    setAvatarFile(null);
     setEditingId(null);
-    setFormData({ title: '', description: '', channel: '', category_id: '' });
-    fetchVideos();
+    setPreviewUrl('');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    window.location.reload();
+  };
+
+  const createCategory = async () => {
+    if (!newCategory.trim()) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/categories`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify({ name: newCategory })
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Category creation failed');
+      }
+      setNewCategory('');
+      fetchCategories();
+      toast.success('Category added!');
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const deleteCategory = async (id) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${getAuthToken()}` }
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Delete failed');
+      }
+      fetchCategories();
+      toast.info('Category deleted');
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   return (
-    <Container>
-      <h2>{editingId ? 'Edit Video' : 'Upload New Video'}</h2>
-      <Form onSubmit={editingId ? (e) => { e.preventDefault(); handleUpdate(); } : handleSubmit}>
-        <Input type="text" name="title" placeholder="Video Title" value={formData.title} onChange={handleChange} required />
-        <Input type="text" name="channel" placeholder="Channel Name" value={formData.channel} onChange={handleChange} />
-        <Input type="text" name="category_id" placeholder="Category ID" value={formData.category_id} onChange={handleChange} />
-        <Textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange} />
-        {!editingId && (
-          <>
-            <FileInput>
-              <label>Choose Video:</label>
-              <input type="file" accept="video/mp4" onChange={(e) => setVideoFile(e.target.files[0])} required />
-            </FileInput>
-            <FileInput>
-              <label>Optional Avatar:</label>
-              <input type="file" accept="image/*" onChange={(e) => setAvatarFile(e.target.files[0])} />
-            </FileInput>
-          </>
-        )}
-        <SubmitButton type="submit">{editingId ? 'Update' : 'Upload'}</SubmitButton>
-        {message && <Message>{message}</Message>}
-      </Form>
-
-      <VideoList>
-        <h3>Uploaded Videos</h3>
-        {videos.map(video => (
-          <VideoItem key={video.id}>
-            <strong>{video.title}</strong> - {video.channel}
-            <ActionButtons>
-              <button onClick={() => handleEdit(video)}>Edit</button>
-              <button onClick={() => handleDelete(video.id)}>Delete</button>
-            </ActionButtons>
-          </VideoItem>
-        ))}
-      </VideoList>
-    </Container>
+    <DashboardContainer>
+      <ToastContainer position="bottom-right" autoClose={3000} />
+      <AdminHeader 
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        handleLogout={handleLogout}
+        videosCount={videos.length}
+      />
+      <DashboardContent>
+        <AdminSidebar videosCount={videos.length} />
+        <MainContent>
+          <VideoForm
+            formData={formData}
+            setFormData={setFormData}
+            videoFile={videoFile}
+            setVideoFile={setVideoFile}
+            avatarFile={avatarFile}
+            setAvatarFile={setAvatarFile}
+            previewUrl={previewUrl}
+            editingId={editingId}
+            isSubmitting={isSubmitting}
+            categories={categories}
+            resetForm={resetForm}
+            handleSubmit={handleSubmit}
+            handleUpdate={handleUpdate}
+          />
+          <SectionDivider />
+          <VideoList
+            videos={videos}
+            isLoading={isLoading}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+            searchTerm={searchTerm}
+          />
+          <SectionDivider />
+          <CategoryManager
+            categories={categories}
+            newCategory={newCategory}
+            setNewCategory={setNewCategory}
+            createCategory={createCategory}
+            deleteCategory={deleteCategory}
+          />
+        </MainContent>
+      </DashboardContent>
+    </DashboardContainer>
   );
 };
 
 export default AdminDashboard;
-
-const Container = styled.div`
-  max-width: 600px;
-  margin: 3rem auto;
-  padding: 2rem;
-  background: #0a0a12;
-  color: #e0e0ff;
-  border-radius: 12px;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const Input = styled.input`
-  padding: 0.8rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-`;
-
-const Textarea = styled.textarea`
-  padding: 0.8rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  resize: vertical;
-  min-height: 100px;
-`;
-
-const FileInput = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.9rem;
-`;
-
-const SubmitButton = styled.button`
-  background: #ffcc00;
-  color: #000;
-  padding: 0.8rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-`;
-
-const Message = styled.p`
-  margin-top: 1rem;
-  color: #4caf50;
-  font-weight: bold;
-`;
-
-const VideoList = styled.div`
-  margin-top: 2rem;
-`;
-
-const VideoItem = styled.div`
-  background: #1a1a2e;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-
-  button {
-    background: #444;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 0.4rem 0.8rem;
-    cursor: pointer;
-
-    &:hover {
-      background: #666;
-    }
-  }
-`;

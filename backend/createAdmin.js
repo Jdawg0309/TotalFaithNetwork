@@ -1,22 +1,18 @@
-require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const db = require('./models/db');
 
-const email = 'admin@tfn.com';
-const password = 'password123';
-
-try {
-  const existing = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
-  if (existing) {
-    console.log('Admin user already exists.');
-    process.exit(0);
+(async () => {
+  const email = 'admin@tfn.com';
+  const password = 'password123';
+  
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  if (!user) {
+    db.prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)').run(email, hashedPassword);
+    console.log('✅ Admin user created: admin@tfn.com / password123');
+  } else {
+    console.log('ℹ️ Admin user already exists.');
   }
-
-  const hash = bcrypt.hashSync(password, 10);
-  db.prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)').run(email, hash);
-  console.log('✅ Admin user inserted:', email);
-  process.exit(0);
-} catch (err) {
-  console.error('❌ Error creating admin:', err.message);
-  process.exit(1);
-}
+})();
