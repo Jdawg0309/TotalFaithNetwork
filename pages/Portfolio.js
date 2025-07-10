@@ -14,7 +14,9 @@ const Portfolio = () => {
   const [projects, setProjects] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [thumbnails, setThumbnails] = useState({});
-  const fadeIn = useSpring({ 
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState('');
+  const fadeIn = useSpring({
     from: { opacity: 0, transform: 'translateY(20px)' }, 
     to: { opacity: 1, transform: 'translateY(0)' }, 
     config: { tension: 200, friction: 20, duration: 800 } 
@@ -52,6 +54,20 @@ const Portfolio = () => {
     if (projects.length > 0) generateThumbnails();
   }, [projects]);
 
+  useEffect(() => {
+    if (!selectedVideo) return;
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/videos/${selectedVideo.id}/comments`);
+        const data = await res.json();
+        setComments(data);
+      } catch (err) {
+        console.error('Error fetching comments:', err);
+      }
+    };
+    fetchComments();
+  }, [selectedVideo]);
+
   const getVideoThumbnail = (videoUrl) => {
     return new Promise((resolve, reject) => {
       const video = document.createElement('video');
@@ -70,6 +86,33 @@ const Portfolio = () => {
       });
       video.addEventListener('error', reject);
     });
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      alert('Please log in to comment');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/videos/${selectedVideo.id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ content: commentText })
+      });
+      if (res.ok) {
+        const newComment = await res.json();
+        setComments((prev) => [...prev, { ...newComment, user_email: 'You' }]);
+        setCommentText('');
+      }
+    } catch (err) {
+      console.error('Error adding comment:', err);
+    }
   };
 
   if (!selectedVideo) return <p style={{ color: 'white', padding: '2rem' }}>Loading...</p>;
@@ -107,6 +150,23 @@ const Portfolio = () => {
             <Description>{selectedVideo.description}</Description>
           </VideoText>
         </VideoInfo>
+
+        <CommentsContainer>
+          {comments.map(c => (
+            <CommentItem key={c.id}>
+              <strong>{c.user_email}:</strong> {c.content}
+              <CommentDate>{c.created_at}</CommentDate>
+            </CommentItem>
+          ))}
+          <CommentForm onSubmit={handleCommentSubmit}>
+            <CommentInput
+              value={commentText}
+              onChange={e => setCommentText(e.target.value)}
+              placeholder="Add a comment"
+            />
+            <CommentButton type="submit">Post</CommentButton>
+          </CommentForm>
+        </CommentsContainer>
 
         {Object.entries(grouped).map(([category, items]) => (
           <GridSection key={category} style={fadeIn}>
@@ -372,4 +432,42 @@ const StatsSmall = styled.p`
   @media (max-width: 768px) {
     font-size: 0.75rem;
   }
+`;
+
+const CommentsContainer = styled.div`
+  margin-top: 20px;
+`;
+
+const CommentItem = styled.div`
+  margin-bottom: 8px;
+  color: #eee;
+`;
+
+const CommentDate = styled.span`
+  margin-left: 6px;
+  color: #888;
+  font-size: 0.8rem;
+`;
+
+const CommentForm = styled.form`
+  display: flex;
+  margin-top: 10px;
+`;
+
+const CommentInput = styled.input`
+  flex: 1;
+  padding: 6px;
+  border-radius: 4px 0 0 4px;
+  border: 1px solid #555;
+  background: #222;
+  color: #fff;
+`;
+
+const CommentButton = styled.button`
+  padding: 6px 12px;
+  border: none;
+  background: ${colors.yellow};
+  color: #000;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
 `;
