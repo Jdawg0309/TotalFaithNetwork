@@ -55,6 +55,16 @@ const initDatabase = () => {
       FOREIGN KEY (playlist_id) REFERENCES playlists(id),
       FOREIGN KEY (video_id) REFERENCES videos(id)
     );
+
+    CREATE TABLE IF NOT EXISTS comments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      video_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      content TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (video_id) REFERENCES videos(id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
   `);
 
   // Default admin seeding:

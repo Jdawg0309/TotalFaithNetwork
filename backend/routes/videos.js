@@ -169,6 +169,40 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Get comments for a video
+router.get('/:id/comments', (req, res) => {
+  const { id } = req.params;
+  try {
+    const comments = db.prepare(`
+      SELECT c.id, c.content, c.created_at, u.email AS user_email
+      FROM comments c
+      JOIN users u ON c.user_id = u.id
+      WHERE c.video_id = ?
+      ORDER BY c.created_at ASC
+    `).all(id);
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching comments', error: err.message });
+  }
+});
+
+// Add a comment to a video
+router.post('/:id/comments', auth, [
+  body('content').trim().notEmpty().withMessage('Content required')
+], (req, res) => {
+  const { id } = req.params;
+  const { content } = req.body;
+  try {
+    const result = db.prepare(
+      'INSERT INTO comments (video_id, user_id, content) VALUES (?, ?, ?)'
+    ).run(id, req.user.id, content);
+    const comment = db.prepare('SELECT id, content, created_at FROM comments WHERE id = ?').get(result.lastInsertRowid);
+    res.status(201).json(comment);
+  } catch (err) {
+    res.status(500).json({ message: 'Error adding comment', error: err.message });
+  }
+});
+
 // Delete video
 router.delete('/:id', auth, (req, res) => {
   const { id } = req.params;
@@ -237,31 +271,3 @@ router.put('/:id', auth, [
 });
 
 module.exports = router;
-router.get('/', (req, res) => {
-  const { page = 1, limit = 10, search = '' } = req.query;
-  const offset = (page - 1) * limit;
-  const like = `%${search}%`;
-
-
-  const total = db.prepare('SELECT COUNT(*) AS count FROM videos WHERE title LIKE ?').get(like).count;
-  const videos = db.prepare().all(like, limit, offset);
-
-  res.json({ videos, totalPages: Math.ceil(total / limit) });
-});
-
-router.get("/", (req, res) => {
-  const { page = 1, limit = 10, search = "" } = req.query;
-  const offset = (page - 1) * limit;
-  const like = `%${search}%`;
-
-  const total = db.prepare("SELECT COUNT(*) AS count FROM videos WHERE title LIKE ?").get(like).count;
-  const videos = db.prepare(`
-    SELECT v.*, c.name AS category_name FROM videos v
-    LEFT JOIN categories c ON v.category_id = c.id
-    WHERE v.title LIKE ?
-    ORDER BY v.created_at DESC
-    LIMIT ? OFFSET ?
-  `).all(like, limit, offset);
-
-  res.json({ videos, totalPages: Math.ceil(total / limit) });
-});
