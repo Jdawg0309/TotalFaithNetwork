@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX, FiHome, FiInfo, FiBriefcase, FiMail, FiSettings } from 'react-icons/fi';
 import styled, { keyframes } from 'styled-components';
+import { colors } from '../theme';
 
 // Color variables
-const NAV_BG = 'rgba(26, 26, 26, 0.95)';
-const TEXT_PRIMARY = '#E0E0FF';
-const TEXT_ACTIVE = '#FFCC00';
-const ACCENT = '#FFCC00';
+const NAV_BG = 'rgba(0, 0, 0, 0.95)';
+const TEXT_PRIMARY = colors.blue;
+const TEXT_ACTIVE = colors.yellow;
+const ACCENT = colors.yellow;
 const HOVER_BG = 'rgba(255, 204, 0, 0.1)';
 
 const Navbar = () => {

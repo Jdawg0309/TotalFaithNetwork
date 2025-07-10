@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { colors } from '../theme';
 import { animated } from '@react-spring/web';
 
 const ContentSection = ({ anim }) => {
@@ -25,7 +26,7 @@ const ContentContainer = styled(animated.div)`
   color: #fff;
   position: relative;
   z-index: 2;
-  background: linear-gradient(transparent, #0a0a12 30%);
+  background: linear-gradient(transparent, ${colors.black} 30%);
 `;
 
 const Title = styled.h1`

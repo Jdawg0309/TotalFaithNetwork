@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled, { createGlobalStyle, keyframes } from 'styled-components';
+import { colors } from '../theme';
 import { useSpring, animated } from '@react-spring/web';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
@@ -151,7 +152,7 @@ const GlobalStyle = createGlobalStyle`
   *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     width: 100%; height: 100%; font-family: 'Poppins', sans-serif;
-    background-color: #0a0a12; color: #e0e0ff;
+    background-color: ${colors.black}; color: ${colors.yellow};
   }
   @media (max-width: 768px) {
     html, body {
@@ -188,7 +189,7 @@ const VideoPlayer = styled.video`
 `;
 
 const VideoTitle = styled.h2`
-  font-size: 2rem; margin-bottom: 12px; color: #ffcc00;
+  font-size: 2rem; margin-bottom: 12px; color: ${colors.yellow};
   @media (max-width: 768px) {
     font-size: 1.5rem;
   }
@@ -217,7 +218,7 @@ const VideoText = styled.div`
 `;
 
 const VideoTitleBig = styled.h3`
-  font-size: 1.4rem; margin-bottom: 6px; color: #ffcc00;
+  font-size: 1.4rem; margin-bottom: 6px; color: ${colors.yellow};
   @media (max-width: 768px) {
     font-size: 1.2rem;
   }
@@ -244,7 +245,7 @@ const GridSection = styled(animated.div)`
 `;
 
 const GridTitle = styled.h3`
-  font-size: 1.5rem; margin-bottom: 16px; color: #ffcc00;
+  font-size: 1.5rem; margin-bottom: 16px; color: ${colors.yellow};
   @media (max-width: 768px) {
     font-size: 1.3rem;
   }
@@ -316,7 +317,7 @@ const LoadingSpinner = styled.div`
   width: 30px; height: 30px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #ffcc00;
+  border-top-color: ${colors.yellow};
   animation: spin 1s ease-in-out infinite;
   
   @keyframes spin {
