@@ -1,5 +1,6 @@
 import React from 'react';
 import styled, { createGlobalStyle, keyframes } from 'styled-components';
+import { colors } from '../theme';
 
 const GlobalStyle = createGlobalStyle`
   *::before, *::after {
@@ -14,8 +15,8 @@ const GlobalStyle = createGlobalStyle`
     overflow-x: hidden;
     font-family: 'Poppins', 'Segoe UI', sans-serif;
     scroll-behavior: smooth;
-    background-color: #0a0a12;
-    color: #e0e0ff;
+    background-color: ${colors.black};
+    color: ${colors.yellow};
   }
 `;
 
@@ -109,7 +110,7 @@ const SectionTitle = styled.h2`
   font-weight: 700;
   margin-bottom: 30px;
   text-align: center;
-  color: #ffcc00;
+  color: ${colors.yellow};
   text-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
 
   @media (max-width: 768px) {
@@ -155,7 +156,7 @@ const CardTitle = styled.h3`
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 5px;
-  color: #ffcc00;
+  color: ${colors.yellow};
   text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
 `;
 

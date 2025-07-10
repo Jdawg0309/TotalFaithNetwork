@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createGlobalStyle } from 'styled-components';
+import { colors } from '../theme';
 import introVideo from '../backend/uploads/videos/intro.mp4';
 import { useSpring, animated, config as springConfig } from 'react-spring';
 import styled, { keyframes } from 'styled-components';
@@ -21,8 +22,8 @@ const GlobalStyle = createGlobalStyle`
     overflow-x: hidden; 
     font-family: 'Poppins', 'Segoe UI', sans-serif;
     scroll-behavior: smooth;
-    background-color: #0a0a12;
-    color: #e0e0ff;
+    background-color: ${colors.black};
+    color: ${colors.yellow};
   }
 
   ::-webkit-scrollbar {
@@ -30,16 +31,16 @@ const GlobalStyle = createGlobalStyle`
   }
 
   ::-webkit-scrollbar-track {
-    background: #1a1a2e;
+    background: ${colors.blue};
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #ffcc00;
+    background: ${colors.yellow};
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #ff9900;
+    background: ${colors.blue};
   }
 `;
 
@@ -203,7 +204,7 @@ const StarryBackground = styled.div`
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background: linear-gradient(to bottom, #0a0a12 0%, #1a1a2e 100%);
+  background: linear-gradient(to bottom, ${colors.black} 0%, ${colors.blue} 100%);
 `;
 
 const Star = styled.div`
@@ -265,7 +266,7 @@ const FeaturedSection = styled.section`
     transform: translateX(-50%);
     width: 80%;
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, #ffcc00 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, ${colors.yellow} 50%, transparent 100%);
   }
 `;
 
@@ -274,7 +275,7 @@ const SectionTitle = styled.h2`
   font-weight: 700;
   margin: 40px 0;
   text-align: center;
-  color: #ffcc00;
+  color: ${colors.yellow};
   text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
   display: flex;
   align-items: center;
@@ -369,7 +370,7 @@ const CardTitle = styled.h3`
   font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 15px;
-  color: #ffcc00;
+  color: ${colors.yellow};
   text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
 `;
 
@@ -381,8 +382,8 @@ const CardText = styled.p`
 `;
 
 const CardButton = styled.button`
-  background: linear-gradient(45deg, #ffcc00, #ff9900);
-  color: #1a1a2e;
+  background: linear-gradient(45deg, ${colors.yellow}, ${colors.blue});
+  color: ${colors.blue};
   border: none;
   border-radius: 30px;
   padding: 10px 25px;
@@ -401,7 +402,7 @@ const CardButton = styled.button`
 const NewsletterSection = styled.section`
   margin: 80px 0;
   padding: 60px 20px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #0a0a12 100%);
+  background: linear-gradient(135deg, ${colors.blue} 0%, ${colors.black} 100%);
   border-radius: 20px;
   box-shadow: 0 0 30px rgba(255, 204, 0, 0.1);
   position: relative;
@@ -429,7 +430,7 @@ const NewsletterContainer = styled.div`
 
 const NewsletterTitle = styled.h3`
   font-size: 2rem;
-  color: #ffcc00;
+  color: ${colors.yellow};
   margin-bottom: 20px;
   text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
 `;
@@ -475,8 +476,8 @@ const NewsletterInput = styled.input`
 
 const NewsletterButton = styled.button`
   padding: 15px 30px;
-  background: linear-gradient(45deg, #ffcc00, #ff9900);
-  color: #1a1a2e;
+  background: linear-gradient(45deg, ${colors.yellow}, ${colors.blue});
+  color: ${colors.blue};
   border: none;
   border-radius: 30px;
   font-size: 1rem;

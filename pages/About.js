@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { colors } from '../theme';
 import { useSpring, useTrail, animated } from '@react-spring/web';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
@@ -256,14 +257,14 @@ Through her ministries—Cyndi Ashley Network International (CAN-I), PMS: Paradi
 // Styled Components
 const PageContainer = styled(animated.div)`
   padding: 0;
-  background: #0a0a12;
+  background: ${colors.black};
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
-  color: #e0e0ff;
+  color: ${colors.yellow};
 `;
 
 const HeroSection = styled.section`
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(135deg, ${colors.blue} 0%, #16213e 100%);
   padding: 5rem 1rem;
   text-align: center;
   position: relative;
@@ -284,7 +285,7 @@ const HeroSection = styled.section`
 const HeroTitle = styled.h1`
   font-size: 3rem;
   margin: 0;
-  color: #ffcc00;
+  color: ${colors.yellow};
   position: relative;
   z-index: 1;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -317,7 +318,7 @@ const SectionTitle = styled.h2`
   font-size: 2.2rem;
   text-align: center;
   margin-bottom: 3rem;
-  color: #ffcc00;
+  color: ${colors.yellow};
   position: relative;
   
   &::after {
@@ -325,7 +326,7 @@ const SectionTitle = styled.h2`
     display: block;
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #ffcc00, #ff9900);
+  background: linear-gradient(90deg, ${colors.yellow}, ${colors.blue});
     margin: 1rem auto 0;
     border-radius: 2px;
   }
@@ -402,7 +403,7 @@ const LeaderContent = styled.div`
 const LeaderName = styled.h3`
   font-size: 1.4rem;
   margin: 0 0 0.5rem;
-  color: #ffcc00;
+  color: ${colors.yellow};
 `;
 
 const LeaderDesc = styled.p`
@@ -414,8 +415,8 @@ const LeaderDesc = styled.p`
 
 const ViewButton = styled.button`
   padding: 0.8rem 1.5rem;
-  background: #ffcc00;
-  color: #1a1a2e;
+  background: ${colors.yellow};
+  color: ${colors.blue};
   border: none;
   border-radius: 30px;
   font-weight: 600;
@@ -481,7 +482,7 @@ const ModalBody = styled.div`
 
 const ModalHeader = styled.h2`
   font-size: 1.8rem;
-  color: #ffcc00;
+  color: ${colors.yellow};
   margin-bottom: 0.5rem;
 `;
 
@@ -528,13 +529,13 @@ const SwiperContainer = styled.div`
     opacity: 1;
     
     &-active {
-      background: #ffcc00;
+      background: ${colors.yellow};
     }
   }
   
   .swiper-button-next, 
   .swiper-button-prev {
-    color: #ffcc00;
+    color: ${colors.yellow};
     
     &:after {
       font-size: 1.5rem;
@@ -630,7 +631,7 @@ const TributeContent = styled.div`
 
 const TributeName = styled.h3`
   font-size: 1.3rem;
-  color: #ffcc00;
+  color: ${colors.yellow};
   margin: 0 0 0.5rem;
 `;
 
@@ -659,7 +660,7 @@ const AboutText = styled.p`
 `;
 
 const MissionStatement = styled.section`
-  background: linear-gradient(135deg, #ffcc00, #ff9900);
+  background: linear-gradient(135deg, ${colors.yellow}, ${colors.blue});
   padding: 4rem 1.5rem;
   text-align: center;
   margin-top: 3rem;
@@ -667,13 +668,13 @@ const MissionStatement = styled.section`
 
 const MissionTitle = styled.h2`
   font-size: 2rem;
-  color: #1a1a2e;
+  color: ${colors.blue};
   margin-bottom: 1.5rem;
 `;
 
 const MissionText = styled.p`
   font-size: 1.3rem;
-  color: #1a1a2e;
+  color: ${colors.blue};
   max-width: 800px;
   margin: 0 auto;
   line-height: 1.6;

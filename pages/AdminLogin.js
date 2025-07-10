@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { colors } from '../theme';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -62,7 +63,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #0a0a12;
+  background: ${colors.black};
 `;
 
 const Form = styled.form`
@@ -84,7 +85,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  background: #ffcc00;
+  background: ${colors.yellow};
   color: black;
   padding: 0.7rem;
   font-weight: bold;

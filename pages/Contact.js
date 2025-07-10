@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { FaYoutube, FaInstagram, FaVimeoV, FaTwitter, FaTumblr, FaLinkedin, FaPaperPlane, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaTiktok } from 'react-icons/fa';
 import styled, { keyframes } from 'styled-components';
+import { colors } from '../theme';
 import { useSpring, animated } from '@react-spring/web';
 
 // Color variables
-const PRIMARY_BG = '#0a0a12';
-const NAV_BG = 'rgba(26, 26, 26, 0.95)';
-const TEXT_PRIMARY = '#E0E0FF';
-const TEXT_ACTIVE = '#FFCC00';
-const ACCENT = '#FFCC00';
+const PRIMARY_BG = colors.black;
+const NAV_BG = 'rgba(0, 0, 0, 0.95)';
+const TEXT_PRIMARY = colors.blue;
+const TEXT_ACTIVE = colors.yellow;
+const ACCENT = colors.yellow;
 const HOVER_BG = 'rgba(255, 204, 0, 0.1)';
 const CARD_BG = 'rgba(20, 20, 30, 0.8)';
 
@@ -206,7 +207,7 @@ const Container = styled(animated.div)`
 const HeaderSection = styled.section`
   padding: 4rem 2rem 2rem;
   text-align: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #0a0a12 100%);
+  background: linear-gradient(135deg, ${colors.blue} 0%, ${colors.black} 100%);
   position: relative;
   overflow: hidden;
 
@@ -217,7 +218,7 @@ const HeaderSection = styled.section`
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, ${ACCENT}, #ff9900);
+    background: linear-gradient(90deg, ${ACCENT}, ${colors.blue});
   }
 `;
 
@@ -342,7 +343,7 @@ const Input = styled.input`
     top: -8px;
     left: 12px;
     font-size: 0.8rem;
-    background: #1a1a2e;
+    background: ${colors.blue};
     padding: 0 6px;
     color: ${ACCENT};
   }
@@ -382,7 +383,7 @@ const TextArea = styled.textarea`
     top: -8px;
     left: 12px;
     font-size: 0.8rem;
-    background: #1a1a2e;
+    background: ${colors.blue};
     padding: 0 6px;
     color: ${ACCENT};
   }
@@ -390,8 +391,8 @@ const TextArea = styled.textarea`
 
 const SubmitButton = styled.button`
   padding: 1rem 1.8rem;
-  background: linear-gradient(135deg, ${ACCENT}, #ff9900);
-  color: #1a1a2e;
+  background: linear-gradient(135deg, ${ACCENT}, ${colors.blue});
+  color: ${colors.blue};
   border: none;
   border-radius: 8px;
   font-size: 1.1rem;
@@ -530,7 +531,7 @@ const ContactInfo = styled.span`
 
 const CTASection = styled.section`
   padding: 4rem 2rem;
-  background: linear-gradient(135deg, #1a1a2e 0%, #0a0a12 100%);
+  background: linear-gradient(135deg, ${colors.blue} 0%, ${colors.black} 100%);
   text-align: center;
   position: relative;
 `;
@@ -555,8 +556,8 @@ const CTAText = styled.p`
 
 const CTAButton = styled.a`
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, ${ACCENT}, #ff9900);
-  color: #1a1a2e;
+  background: linear-gradient(135deg, ${ACCENT}, ${colors.blue});
+  color: ${colors.blue};
   border: none;
   border-radius: 8px;
   font-size: 1.1rem;

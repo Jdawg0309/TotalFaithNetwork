@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { colors } from '../theme';
 import { animated } from '@react-spring/web';
 
 const TheaterStage = ({ curtainAnim, introVideo }) => {
@@ -133,7 +134,7 @@ const TheaterName = styled.div`
   font-size: 1.8rem;
   font-weight: 700;
   letter-spacing: 8px;
-  color: #ffcc00;
+  color: ${colors.yellow};
   text-transform: uppercase;
   text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
   margin-bottom: 10px;
@@ -146,7 +147,7 @@ const TheaterName = styled.div`
 
 const ScreenInfo = styled.div`
   font-size: 1.2rem;
-  color: #ffcc00;
+  color: ${colors.yellow};
   text-transform: uppercase;
   letter-spacing: 3px;
   text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
