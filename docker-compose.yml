@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: livekit
+    restart: unless-stopped
+    ports:
+      - "7880:7880"  # Signaling
+      - "7881:7881/udp"  # Media RTP/ICE
+    environment:
+      - LIVEKIT_KEYS=api-key:api-secret
+      - LIVEKIT_PORT=7880
