@@ -8,7 +8,7 @@ import {
   GlobalStyle, StarryBackground, Star, PageContainer, VideoPlayer, VideoTitle,
   VideoInfo, ChannelAvatar, VideoText, VideoTitleBig, StatsRow, Views, Dot,
   Timestamp, Description, GridSection, GridTitle, Grid, PlayIcon, Card,
-  ThumbnailWrapper, Thumbnail, ThumbnailPlaceholder, LoadingSpinner, DurationBadge,
+  ThumbnailWrapper, Thumbnail, ThumbnailPlaceholder, LoadingSpinner,
   InfoRow, SmallAvatar, InfoText, CardTitle, ChannelNameSmall, StatsSmall,
   ErrorMessage, RetryButton
 } from '../../styles/PortfolioStyles';
@@ -66,13 +66,6 @@ const Portfolio = () => {
       month: 'long', 
       day: 'numeric' 
     });
-  }, []);
-
-  const formatDuration = useMemo(() => (duration) => {
-    if (typeof duration !== 'number') return '0:00';
-    const minutes = Math.floor(duration / 60);
-    const seconds = Math.floor(duration % 60);
-    return `${minutes}:${String(seconds).padStart(2, '0')}`;
   }, []);
 
   // Data fetching
@@ -457,9 +450,6 @@ const Portfolio = () => {
                         </ThumbnailPlaceholder>
                       )}
                       <PlayIcon>▶</PlayIcon>
-                      <DurationBadge>
-                        {formatDuration(video.duration)}
-                      </DurationBadge>
                     </ThumbnailWrapper>
                     <InfoRow>
                       <SmallAvatar 
