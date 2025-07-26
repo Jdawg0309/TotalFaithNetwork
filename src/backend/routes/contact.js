@@ -1,46 +1,67 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
-const router = express.Router();
+const router  = express.Router();
+const db      = require('../models/db');
 
-router.post('/', async (req, res) => {
-  const { name, email, subject, message } = req.body;
+// Ensure table exists
+db.exec(`
+  CREATE TABLE IF NOT EXISTS contact_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    reason TEXT,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+`);
 
+// Create a new message
+router.post('/', (req, res) => {
+  const { name, email, subject, message, reason } = req.body;
   if (!name || !email || !subject || !message) {
     return res.status(400).json({ error: 'All fields are required' });
   }
-
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.mail.yahoo.com',
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,  // your Yahoo email
-      pass: process.env.EMAIL_PASS   // Yahoo App Password
-    }
-  });
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,    // Always from your account
-    to: process.env.EMAIL_USER,      // Always sent to your account
-    subject: `[TFN Contact] ${subject}`,
-    text: `
-You received a new message from the contact form:
-
-Name: ${name}
-Email: ${email}
-
-Message:
-${message}
-    `.trim()
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
-    console.log(`📩 New contact form submission from ${email}`);
-    res.status(200).json({ success: true });
+    db.prepare(
+      `INSERT INTO contact_messages (name, email, subject, reason, message)
+       VALUES (?, ?, ?, ?, ?)`
+    ).run(name, email, subject, reason || '', message);
+    res.json({ success: true });
   } catch (err) {
-    console.error('❌ Error sending email:', err);
-    res.status(500).json({ error: 'Failed to send email' });
+    console.error('❌ Failed to save message:', err);
+    res.status(500).json({ error: 'Failed to save message' });
+  }
+});
+
+// List all messages
+router.get('/messages', (req, res) => {
+  try {
+    const messages = db.prepare(
+      `SELECT id, name, email, subject, reason, message, created_at
+       FROM contact_messages
+       ORDER BY created_at DESC`
+    ).all();
+    res.json(messages);
+  } catch (err) {
+    console.error('❌ Failed to fetch messages:', err);
+    res.status(500).json({ error: 'Failed to load messages' });
+  }
+});
+
+// Delete a message
+router.delete('/messages/:id', (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = db.prepare(
+      `DELETE FROM contact_messages WHERE id = ?`
+    ).run(id);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Failed to delete message:', err);
+    res.status(500).json({ error: 'Failed to delete message' });
   }
 });
 

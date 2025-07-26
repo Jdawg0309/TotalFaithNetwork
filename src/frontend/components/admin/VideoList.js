@@ -1,4 +1,3 @@
-// src/components/admin/VideoList.js
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
@@ -48,6 +47,11 @@ const TabBtn = styled.button`
     `}
 `;
 
+// FIX: Explicit API_BASE_URL fallback for production
+const API_BASE_URL = window.location.origin.includes('localhost')
+  ? 'http://localhost:5000'
+  : 'http://142.93.53.4:5000';
+
 const VideoList = ({
   videos,
   isLoading,
@@ -68,29 +72,20 @@ const VideoList = ({
   };
 
   if (isLoading) return <LoadingSpinner />;
-
   if (!videos.length) return <EmptyState>No videos found. Upload your first video!</EmptyState>;
 
   return (
     <>
       <ContentHeader>
         <h1>Your Videos</h1>
-
         <TabsContainer>
-          <TabBtn
-            active={activeTab === 'videos'}
-            onClick={() => setActiveTab('videos')}
-          >
+          <TabBtn active={activeTab === 'videos'} onClick={() => setActiveTab('videos')}>
             Videos
           </TabBtn>
-          <TabBtn
-            active={activeTab === 'comments'}
-            onClick={onCommentsTab}
-          >
+          <TabBtn active={activeTab === 'comments'} onClick={onCommentsTab}>
             Comments
           </TabBtn>
         </TabsContainer>
-
         <SortSelect>
           <option>Newest first</option>
           <option>Most popular</option>
@@ -106,7 +101,7 @@ const VideoList = ({
                 <ThumbnailContainer>
                   {video.avatar_url ? (
                     <Thumbnail
-                      src={`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000'}${video.avatar_url}`}
+                      src={`${API_BASE_URL}${video.avatar_url}`}
                       alt={video.title}
                     />
                   ) : (

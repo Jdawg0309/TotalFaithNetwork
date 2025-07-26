@@ -13,6 +13,7 @@ import Portfolio  from './pages/public/Portfolio';
 import Blog       from './pages/public/Blog';
 import BlogDetail from './pages/public/BlogDetail';
 import ShortsFeed from './pages/public/ShortsFeed';
+import AdminInbox from './components/admin/AdminInbox';
 
 import AdminLogin     from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -44,6 +45,13 @@ function App() {
             <AdminDashboard />
           </ProtectedRoute>
         }/>
+        <Route path="/admin/inbox" element={
+          <ProtectedRoute>
+            <AdminInbox />
+          </ProtectedRoute>
+        }/>
+
+        {/* ─── Fallback ───────────────────────────────── */}
       </Routes>
 
       <Footer />

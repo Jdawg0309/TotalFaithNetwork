@@ -31,7 +31,7 @@ const Footer = () => {
     },
     {
       platform: 'LinkedIn',
-      url: 'https://www.linkedin.com/in/drcynthiaoriyomiashley/',
+      url: 'https://www.linkedin.com/company/totalfaithnetwork/',
       icon: <FaLinkedin />,
     }
   ];

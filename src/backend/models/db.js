@@ -204,6 +204,49 @@ const initDatabase = () => {
     console.log('✅ Seeded empty about_content row');
   }
 
+  // === contact_messages migration & seeding ===
+  {
+    const contactCols = db.prepare(`PRAGMA table_info(contact_messages)`).all().map(c => c.name);
+    if (!contactCols.length) {
+      db.prepare(`
+        CREATE TABLE contact_messages (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          email TEXT NOT NULL,
+          subject TEXT NOT NULL,
+          reason TEXT,
+          message TEXT NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `).run();
+      console.log('⚙️ Migration: Created contact_messages table');
+    }
+
+    // Seed some test rows if table is empty
+    const rowCount = db.prepare(`SELECT COUNT(*) AS cnt FROM contact_messages`).get().cnt;
+    if (rowCount === 0) {
+      const seed = [
+        { name: 'Alice Rivera', email: 'alice@example.com', subject: 'Speaking Opportunity', reason: 'Collaboration', message: 'We’d love to feature your network in an upcoming event.' },
+        { name: 'Marcus Lee',   email: 'marcus@example.com', subject: 'Prayer Support',      reason: 'Prayer Request', message: 'Please pray for healing in my family.' },
+        { name: 'Tasha Smith',  email: 'tasha.smith@gmail.com', subject: 'TFN Feedback',       reason: 'Feedback',       message: 'The community content has truly uplifted me, thank you.' },
+        { name: 'Jonah Miles',  email: 'jonah@startup.io', subject: 'Sponsorship Inquiry', reason: 'General Inquiry',message: 'Looking to sponsor a show for Q4. Can we talk this week?' },
+      ];
+
+      const insert = db.prepare(`
+        INSERT INTO contact_messages (name, email, subject, reason, message)
+        VALUES (@name, @email, @subject, @reason, @message)
+      `);
+      const insertMany = db.transaction(msgs => {
+        for (const m of msgs) insert.run(m);
+      });
+      insertMany(seed);
+
+      console.log(`✅ Seeded ${seed.length} contact_messages`);
+    }
+  }
+
+
+
   // Default admin seeding:
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@tfn.com';
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';

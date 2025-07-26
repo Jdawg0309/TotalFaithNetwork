@@ -59,6 +59,7 @@ const AdminSidebar = ({
   videosCount, 
   postsCount, 
   eventsCount,
+  messagesCount,
   currentView, 
   setCurrentView,
   className 
@@ -81,6 +82,12 @@ const AdminSidebar = ({
       label: 'Events',
       icon: '📅',
       count: eventsCount
+    },
+    {
+      id: 'inbox',
+      label: 'Inbox',
+      icon: '✉️',
+      count: messagesCount
     },
     {
       id: 'about',
@@ -146,6 +153,7 @@ AdminSidebar.propTypes = {
   videosCount: PropTypes.number,
   postsCount:  PropTypes.number,
   eventsCount: PropTypes.number,
+  messagesCount: PropTypes.number,
   currentView: PropTypes.string.isRequired,
   setCurrentView: PropTypes.func.isRequired,
   className:   PropTypes.string
@@ -154,7 +162,8 @@ AdminSidebar.propTypes = {
 AdminSidebar.defaultProps = {
   videosCount: 0,
   postsCount:  0,
-  eventsCount: 0
+  eventsCount: 0,
+  messagesCount: 0
 };
 
 export default AdminSidebar;

@@ -2,6 +2,7 @@
   "name": "total_faith_network",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:5000",
   "dependencies": {
     "@react-spring/web": "^9.7.5",
     "@testing-library/dom": "^10.4.0",
@@ -11,6 +12,7 @@
     "@types/react-datepicker": "^6.2.0",
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^11.10.0",
     "cookie-parser": "^1.4.7",
     "ffprobe-static": "^3.1.0",
     "polished": "^4.3.1",

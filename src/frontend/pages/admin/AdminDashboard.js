@@ -5,12 +5,13 @@ import { useNavigate } from 'react-router-dom';
 
 import AdminHeader from '../../components/admin/AdminHeader';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import AdminAbout from '../../components/admin/AdminAbout';
 import VideoForm from '../../components/admin/VideoForm';
 import VideoList from '../../components/admin/VideoList';
 import CategoryManager from '../../components/admin/CategoryManager';
 import BlogManager from '../../components/admin/BlogManager';
 import EventManager from '../../components/admin/EventManager';
-import AdminAbout from '../../components/admin/AdminAbout';  // ← Add this import
+import AdminInbox from '../../components/admin/AdminInbox';  // ← Import Inbox page
 
 import {
   DashboardContainer,
@@ -20,7 +21,6 @@ import {
 } from '../../components/shared/StyledComponents';
 
 const API_BASE_URL = window.location.origin;
-
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -47,14 +47,16 @@ const AdminDashboard = () => {
 
   const [postsCount, setPostsCount] = useState(0);
   const [events, setEvents] = useState([]);
+  const [messagesCount, setMessagesCount] = useState(0); // ← track inbox count
 
   const getAuthToken = () => localStorage.getItem('authToken') || '';
 
+  // Fetch videos
   const fetchVideos = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${API_BASE_URL}/api/videos?page=${currentPage}&limit=${videosPerPage}&search=${searchTerm}`
+        `${API_BASE_URL}/api/videos?page=${currentPage}&limit=${videosPerPage}&search=${encodeURIComponent(searchTerm)}`
       );
       if (!res.ok) throw new Error('Failed to fetch videos');
       const { videos: v, totalPages: tp } = await res.json();
@@ -67,6 +69,7 @@ const AdminDashboard = () => {
     }
   }, [currentPage, searchTerm]);
 
+  // Fetch categories
   const fetchCategories = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/categories`);
@@ -77,6 +80,7 @@ const AdminDashboard = () => {
     }
   }, []);
 
+  // Count posts
   const fetchPostsCount = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/posts`);
@@ -88,6 +92,7 @@ const AdminDashboard = () => {
     }
   }, []);
 
+  // Fetch events list
   const fetchEvents = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/events`, {
@@ -100,6 +105,18 @@ const AdminDashboard = () => {
     }
   }, []);
 
+  // Fetch inbox messages count
+  const fetchMessagesCount = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/contact/messages`);
+      if (!res.ok) throw new Error('Failed to fetch inbox count');
+      const msgs = await res.json();
+      setMessagesCount(msgs.length);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
   useEffect(() => {
     const token = getAuthToken();
     if (!token) return navigate('/admin/login');
@@ -108,7 +125,8 @@ const AdminDashboard = () => {
     fetchCategories();
     fetchPostsCount();
     fetchEvents();
-  }, [navigate, fetchVideos, fetchCategories, fetchPostsCount, fetchEvents]);
+    fetchMessagesCount(); // ← load inbox count
+  }, [navigate, fetchVideos, fetchCategories, fetchPostsCount, fetchEvents, fetchMessagesCount]);
 
   useEffect(() => {
     if (!videoFile) return;
@@ -117,6 +135,7 @@ const AdminDashboard = () => {
     return () => URL.revokeObjectURL(url);
   }, [videoFile]);
 
+  // Video form submit
   const handleSubmit = async e => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -142,6 +161,7 @@ const AdminDashboard = () => {
     }
   };
 
+  // Video update
   const handleUpdate = async () => {
     if (!editingId) return;
     setIsSubmitting(true);
@@ -165,6 +185,7 @@ const AdminDashboard = () => {
     }
   };
 
+  // Delete video
   const handleDelete = async id => {
     if (!window.confirm('Are you sure you want to delete this video?')) return;
     try {
@@ -199,6 +220,7 @@ const AdminDashboard = () => {
     setPreviewUrl('');
   };
 
+  // Category creation & delete
   const createCategory = async () => {
     if (!newCategory.trim()) return;
     try {
@@ -252,10 +274,12 @@ const AdminDashboard = () => {
           videosCount={videos.length}
           postsCount={postsCount}
           eventsCount={events.length}
+          messagesCount={messagesCount}  // ← pass inbox count
           currentView={currentView}
           setCurrentView={setCurrentView}
         />
         <MainContent>
+          {currentView === 'inbox' && <AdminInbox />}
           {currentView === 'videos' && (
             <>
               <VideoForm

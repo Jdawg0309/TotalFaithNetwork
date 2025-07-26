@@ -9,7 +9,6 @@ import { useSpring } from '@react-spring/web';
 // Correct way to import both named exports and namespace
 import { 
   GlobalStyle,
-  TO_EMAIL,
   socialLinks,
   services 
 } from '../../styles/Contact.styles';
@@ -41,25 +40,26 @@ export default function Contact() {
     e.preventDefault();
     setFormSubmitted(true);
     try {
-      const baseURL = typeof window !== 'undefined' && window.location.origin
-  ? window.location.origin
-  : 'http://localhost:5000';
-
-const res = await fetch(`${baseURL}/api/contact`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(form),
-});
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
       if (res.ok) {
         setSent(true);
       } else {
-        console.error('Failed to send message');
+        console.error('Failed to save message');
       }
     } catch (err) {
-      console.error('Error sending message:', err);
+      console.error('Error saving message:', err);
     }
-    setTimeout(() => { setSent(false); setFormSubmitted(false); }, 4000);
+
+    setTimeout(() => {
+      setSent(false);
+      setFormSubmitted(false);
+    }, 4000);
+
     setForm({ name:'', email:'', subject:'', message:'' });
   };
 
@@ -105,7 +105,7 @@ const res = await fetch(`${baseURL}/api/contact`, {
               <S.SubmitButton type="submit" disabled={formSubmitted}>
                 {formSubmitted ? <><FaCheck /> Sent!</> : <><FaPaperPlane /> Send Message</>}
               </S.SubmitButton>
-              {sent && <S.SuccessMessage>✓ Message sent successfully</S.SuccessMessage>}
+              {sent && <S.SuccessMessage>✓ Message saved successfully</S.SuccessMessage>}
             </S.ContactForm>
           </S.FormContainer>
         )}
@@ -122,21 +122,19 @@ const res = await fetch(`${baseURL}/api/contact`, {
         )}
 
         {tab === 'services' && (
-          <>
-            <S.ServicesSection>
-              <S.SectionTitle>Our Services</S.SectionTitle>
-              <S.ServicesGrid>
-                {services.map((srv, i) => (
-                  <S.ServiceCard key={i} onClick={() => openServiceModal(srv)}>
-                    <S.ServiceIcon>{srv.icon}</S.ServiceIcon>
-                    <S.ServiceTitle>{srv.title}</S.ServiceTitle>
-                    <S.ServiceDescription>{srv.description}</S.ServiceDescription>
-                    <S.LearnMore>Learn more <FaChevronRight/></S.LearnMore>
-                  </S.ServiceCard>
-                ))}
-              </S.ServicesGrid>
-            </S.ServicesSection>
-          </>
+          <S.ServicesSection>
+            <S.SectionTitle>Our Services</S.SectionTitle>
+            <S.ServicesGrid>
+              {services.map((srv, i) => (
+                <S.ServiceCard key={i} onClick={() => openServiceModal(srv)}>
+                  <S.ServiceIcon>{srv.icon}</S.ServiceIcon>
+                  <S.ServiceTitle>{srv.title}</S.ServiceTitle>
+                  <S.ServiceDescription>{srv.description}</S.ServiceDescription>
+                  <S.LearnMore>Learn more <FaChevronRight/></S.LearnMore>
+                </S.ServiceCard>
+              ))}
+            </S.ServicesGrid>
+          </S.ServicesSection>
         )}
       </S.Container>
 
